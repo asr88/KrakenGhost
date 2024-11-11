@@ -1,0 +1,18 @@
+{
+  "USERNAME1": "petu34@yopmail.com",
+  "PASSWORD1": "Contraseña123,",
+  "USERNAME2": "automatizacion@appbajopruebas.com",
+  "PASSWORD2": "tJnAQA#T632v#cD",
+  "TITLEPOST": "Inteligencia artificial",
+  "DETAILPOST": "La inteligencia artificial (IA), en el contexto de las ciencias de la computaci....",
+  "TITLEPOSTEDIT": "Titulo Editado",
+  "DETAILPOSTEDIT": "Editar el detalle del Post.....",
+  "NAME": "Nombre Cambiado",
+  "PASSWORDNEW": "tJnAQA#T632v#cD???",
+  "URL": "http://localhost:3001/ghost/",
+  "POST": "http://localhost:3001/ghost/#/posts/",
+  "EDITORPOST": "http://localhost:3001/ghost/#/editor/post/",
+  "PAGE": "http://localhost:3001/ghost/#/pages/",
+  "EDITORPAGE": "http://localhost:3001/ghost/#/editor/page/",
+  "FILEPATH": "../generate-data/aprioriLogin.csv"
+}
