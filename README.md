@@ -7,11 +7,12 @@ Pruebas realizadas sobre ghost con kraken-
 # Requisitos:
 
 - Node
-- Ghost
+- Ghost latest version y ghost version 4.5.0
 - Tener un usuario registrado en el aplicativo ghost
 
 # Pasos para correr los escenarios de pruebas:
 
+- Debe tener las dos versiones de ghost que se van a utilizar ya instaladas y de ser posible dockerizadas.
 - Clonar el repositorio en su equipo local, git clone https://github.com/asr88/KrakenGhost.git
 - Ejecutar **npm install kraken-node -g**, esto instalara dos librerias necesarias para correr los escenarios con kraken.
 - Ejecutar **npm install kraken-node**
@@ -21,6 +22,16 @@ Pruebas realizadas sobre ghost con kraken-
 - Moficar las variables del archivo **properties.json** de acuerdo a su entorno y preferencia, pero como requitos: **USERNAME1**, **PASSWORD1**.
 - Para ejecutar cada escenario, se debe llevar uno a uno de la carpeta **/all_features** a la carpeta **/features** y regresarlo a medida que lo haya ejecutado.
 - Ejecutar el comando **npx kraken-node run**, esto ejecutar el escenario correspondiente.
+- Para cambiar la versión de ghost se debe modificar el archivo properties.json a la URL donde se encuentra la versión de ghost que se desea probar. Es importante que modificar los hooks usados para generar los screenshots de acuerdo a la versión de ghost que se este utilizando, para más adelante poder ejecutar el reporte de comparación de imagenes con mayor facilidad.
+
+# Pasos para ejecutar el reporte de comparación de imagenes:
+
+- Crear una carpeta con el nombre **screenshots** en la carpeta creada igualmente en el proyecto llamada **Resemble**
+- Ejecutar el comando **npm install resemblejs**
+- En el directorio **Resemble** se debe crear un archivo index.js y un archivo config.json con la configuración necesaria para ejecutar el reporte de comparación de imagenes.
+- Es importante definir bien las rutas de las imagenes según se va a comparar.
+- En nuestro caso fue necesario usar la dependencia sharp para poder comparar las imagenes, por lo que se debe instalarla con el comando **npm install sharp**
+- Por último se debe ejecutar el comando **npm test**
 
 # Las 10 funcionalidades de GHOST que se trabajan en esta semana 5 son:
 
@@ -41,5 +52,8 @@ Pruebas realizadas sobre ghost con kraken-
 - prueba15 (Verificar Edición de información de un post)
 
 ```
+# En la semana 6 se trabajó la mejora en las pruuebas realizadas de la semana 5 y se lograron correr dos de las mismas pruebas con la versión de ghost 4.5.0, las pruebas que se lograron    ejecutar son:
+- prueba 0 (Hacer login)
+- prueba1 (Crear page)
 
 ```
