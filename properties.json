@@ -1,10 +1,10 @@
 {
-  "USERNAME1": "petu34@yopmail.com",
-  "PASSWORD1": "Contraseña123,",
-  "URL": "http://localhost:3001/ghost/",
-  "POST": "http://localhost:3001/ghost/#/posts/",
-  "EDITORPOST": "http://localhost:3001/ghost/#/editor/post/",
-  "PAGE": "http://localhost:3001/ghost/#/pages/",
-  "EDITORPAGE": "http://localhost:3001/ghost/#/editor/page/",
+  "USERNAME1": "asr@hotmail.com",
+  "PASSWORD1": "contraseña123",
+  "URL": "http://localhost:2368/ghost/#/signin",
+  "POST": "http://localhost:2368/#/posts/",
+  "EDITORPOST": "http://localhost:2368/#/editor/post/",
+  "PAGE": "http://localhost:2368/#/pages/",
+  "EDITORPAGE": "http://localhost:2368/#/editor/page/",
   "FILEPATH": "../generate-data/aprioriLogin.csv"
 }

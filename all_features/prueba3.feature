@@ -10,18 +10,18 @@ Scenario: Con mi usuario de ghost quiero crear un post exitosamente
   And I wait for 1 seconds
   And I submit login
   And I wait for 5 seconds
-  Then I should be logged in
+  When I click on the posts option
   And I wait for 2 seconds
-  When I click on the "posts" function
+  When I Click on the new post button 
   And I wait for 2 seconds
-  Then I should have this "new-post" button
-  And I wait for 2 seconds
-  When I click new post
-  And I wait for 2 seconds
-  And I enter title post
-  And I wait for 2 seconds
-  And I enter detail post
-  And I wait for 2 seconds
-  And I send post
+  When I enter title post
+  And I wait for 1 seconds
+  When I enter detail post
+  And I wait for 1 seconds
+  When I click publish
+  And I wait for 1 seconds
+  When I click publish confirm
   And I wait for 3 seconds
- 
+  When I click final publish
+  And I wait for 3 seconds
+  Then I see the post created

@@ -9,16 +9,14 @@ Scenario: Crear tag exitosamene
   And I enter login password "<PASSWORD1>"
   And I wait for 1 seconds
   And I submit login  
-  
-  When I click on the "tags" function
+  And I wait for 5 seconds
+  When I click on the tags option
   And I wait for 1 seconds
-  Then I should have this "gh-btn gh-btn-green" button 
-
   When I click new tag
   And I wait for 1 seconds
-  And I enter tag name "test"
+  And I enter tag name "Prueba"
   And I wait for 1 seconds
-  And I submit tag
+  When I click on save button
   And I wait for 1 seconds
 
       

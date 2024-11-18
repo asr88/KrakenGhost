@@ -10,17 +10,17 @@ Scenario: Con mi usuario y contraseña de ghost quiero crear un sitio exitosamen
   And I wait for 1 seconds
   And I submit login
   And I wait for 3 seconds
-  Then I wait for 2 seconds
-  And I navigate to page "<PAGE>"
-  And I wait for 1 seconds
-  And I navigate to page "<EDITORPAGE>"
+  When I clck on the page option
+  And I wait for 2 seconds
+  When I Click on the new page button
   And I wait for 2 seconds
   When I enter title page
   And I wait for 1 seconds
   When I enter detail page
-  And I wait for 2 seconds
+  And I wait for 1 seconds
   When I click publish
   And I wait for 1 seconds
   When I click publish confirm
-  And I wait for 3 seconds
+  Then I see the page created
+
   

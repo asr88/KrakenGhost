@@ -10,14 +10,9 @@ Scenario: Con mi usuario de ghost quiero verificar que no se puede publicar un p
   And I wait for 1 seconds
   And I submit login
   And I wait for 5 seconds
-  Then I should be logged in
+ When I click on the posts option
   And I wait for 2 seconds
-  When I click on the "posts" function
+  When I Click on the new post button 
   And I wait for 2 seconds
-  Then I should have this "new-post" button
-  And I wait for 2 seconds
-  When I click new post
-  And I wait for 2 seconds
-  Then I send post
-  And I wait for 3 seconds
- 
+   And I wait for 2 seconds
+  Then I should not see the publish button

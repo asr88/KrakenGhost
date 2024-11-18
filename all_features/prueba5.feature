@@ -8,20 +8,12 @@ Scenario: Con mi usuario de ghost quiero crear un nuevo miembro exitosamente
   And I enter login password "<PASSWORD1>"
   And I wait for 1 seconds
   And I submit login
-  
-  When I click on the "members" function
+  And I wait for 5 seconds
+  When I click on the members function
   And I wait for 1 seconds
-  Then I should have this "gh-btn gh-btn-green" button 
-  Then I save existing email
-
-  When I click new member
+  When I enter email new member "test@test.com"
   And I wait for 1 seconds
-  And I enter member name "test"
+  When I click on save button
   And I wait for 1 seconds
-  And I enter member email "test@test.com"
-  And I wait for 1 seconds
-  And I enter member password "test"
-  And I wait for 1 seconds
-  And I submit member 
-  And I wait for 1 seconds
+  Then I see the member created
   

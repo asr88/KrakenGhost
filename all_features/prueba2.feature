@@ -10,11 +10,9 @@ Scenario: Con mi usuario y contraseña de ghost quiero crear un sitio sin nombre
   And I wait for 1 seconds
   And I submit login
   And I wait for 3 seconds
-  Then I wait for 2 seconds
-  And I navigate to page "<PAGE>"
-  And I wait for 1 seconds
-  And I navigate to page "<EDITORPAGE>"
-  And I wait for 5 seconds
-  Then I should not see the publish button
+  When I clck on the page option
   And I wait for 2 seconds
+  When I Click on the new page button
+  And I wait for 2 seconds
+  Then I should not see the publish button
   

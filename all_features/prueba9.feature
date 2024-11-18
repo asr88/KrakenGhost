@@ -9,15 +9,14 @@ Scenario: Editar el titulo y la descripcion del sitio exitosamente
   And I enter login password "<PASSWORD1>"
   And I wait for 1 seconds
   And I submit login
-
-  When I click on the "settings" function
+  And I wait for 5 seconds
+  When I click on the settings option
   And I wait for 1 seconds
-
   When I click edit site
   And I wait for 7 seconds
-  And I enter site title "test"
+  And I enter site title "Why Not Ghost"
   And I wait for 1 seconds
-  And I enter site description "test"
+  And I enter site description "Why Not Ghost is a blog about why not ghost"
   And I wait for 1 seconds
   And I click on save settings button
   And I wait for 1 seconds
