@@ -2,6 +2,50 @@ const { Given, When, Then } = require("@cucumber/cucumber");
 const properties = require("../../../properties.json");
 const { expect } = require("chai");
 
+// Definición de selectores como constantes
+const SELECTORS = {
+  PAGES: {
+    MENU: {
+      DATA_TEST: '[data-test-nav="pages"]',
+      HREF: 'a[href="#/pages/"]',
+      LINK_TEXT: "a=Pages",
+      FALLBACK: '.gh-nav-list a[href="#/pages/"]',
+    },
+    NEW_BUTTON: {
+      DATA_TEST: "[data-test-new-page-button]",
+      HREF: 'a[href="#/editor/page/"]',
+      CLASS: ".gh-btn-primary",
+    },
+    LIST: {
+      DATA_TEST: "[data-test-pages-list]",
+      CLASS: ".gh-list",
+    },
+  },
+};
+
+// Función auxiliar para intentar múltiples selectores
+async function trySelectors(driver, selectorObj, action = "click") {
+  for (const [key, selector] of Object.entries(selectorObj)) {
+    try {
+      const element = await driver.$(selector);
+      const isDisplayed = await element.isDisplayed();
+      const isClickable = await element.isClickable();
+
+      if (isDisplayed && isClickable) {
+        if (action === "click") {
+          await element.click();
+        }
+        return element;
+      }
+    } catch (error) {
+      console.log(`Failed with selector ${key}: ${selector}`, error.message);
+    }
+  }
+  throw new Error(
+    `No working selector found in ${JSON.stringify(selectorObj)}`
+  );
+}
+
 When("I enter login email {string}", async function (email) {
   let element = await this.driver.$("#identification");
   const emailKey = email.replace(/[<>]/g, "");
@@ -19,9 +63,79 @@ When("I submit login", async function () {
   return await element.click();
 });
 
-When("I clck on the page option", async function () {
-  let element = await this.driver.$('[data-test-nav="pages"]');
-  return await element.click();
+When("I click on the page option", async function () {
+  try {
+    // Esperar a que la página se cargue
+    await this.driver.waitUntil(
+      async () => {
+        const element = await this.driver.$(SELECTORS.PAGES.MENU.DATA_TEST);
+        return await element.isDisplayed();
+      },
+      {
+        timeout: 10000,
+        timeoutMsg: "Pages menu not visible after 10s",
+      }
+    );
+
+    // Intentar hacer clic usando múltiples selectores
+    await trySelectors(this.driver, SELECTORS.PAGES.MENU);
+
+    // Esperar a que la navegación se complete
+    await this.driver.waitUntil(
+      async () => {
+        const url = await this.driver.getUrl();
+        return url.includes("/pages");
+      },
+      {
+        timeout: 5000,
+        timeoutMsg: "URL did not change to pages after clicking",
+      }
+    );
+  } catch (error) {
+    console.error("Error clicking pages option:", error);
+    // Tomar screenshot para debugging
+    await this.driver.saveScreenshot("error-clicking-pages.png");
+    throw error;
+  }
+});
+
+When("I go to pages", async function () {
+  try {
+    // Esperar a que la lista de páginas sea visible
+    await this.driver.waitUntil(
+      async () => {
+        const pagesList = await this.driver.$(SELECTORS.PAGES.LIST.DATA_TEST);
+        return await pagesList.isDisplayed();
+      },
+      {
+        timeout: 5000,
+        timeoutMsg: "Pages list not visible after 5s",
+      }
+    );
+
+    // Verificar que estamos en la página correcta
+    const currentUrl = await this.driver.getUrl();
+    if (!currentUrl.includes("/pages")) {
+      // Si no estamos en la página correcta, intentar navegar
+      await trySelectors(this.driver, SELECTORS.PAGES.MENU);
+    }
+
+    // Esperar a que la lista se cargue
+    await this.driver.waitUntil(
+      async () => {
+        const list = await this.driver.$(SELECTORS.PAGES.LIST.CLASS);
+        return await list.isDisplayed();
+      },
+      {
+        timeout: 5000,
+        timeoutMsg: "Pages list not loaded after navigation",
+      }
+    );
+  } catch (error) {
+    console.error("Error navigating to pages:", error);
+    await this.driver.saveScreenshot("error-navigating-pages.png");
+    throw error;
+  }
 });
 
 When("I click on the posts option", async function () {

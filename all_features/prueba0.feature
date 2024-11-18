@@ -10,4 +10,4 @@ Scenario: Con mi usuario y contraseña de ghost quiero iniciar sesión exitosame
   And I wait for 1 seconds
   And I submit login
   And I wait for 3 seconds
-  Then I should see the text "<TEXT1>"
+  Then I should see the text "Dashboard"

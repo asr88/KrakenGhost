@@ -1,0 +1,16 @@
+{
+  "name": "resemble",
+  "version": "1.0.0",
+  "description": "Visual regression testing",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js"
+  },
+  "dependencies": {
+    "fs-extra": "^11.1.1",
+    "pixelmatch": "^5.3.0",
+    "pngjs": "^6.0.0",
+    "resemble": "file:",
+    "sharp": "^0.32.5"
+  }
+}

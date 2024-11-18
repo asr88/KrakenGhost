@@ -10,7 +10,7 @@ Scenario: Con mi usuario y contraseña de ghost quiero crear un sitio exitosamen
   And I wait for 1 seconds
   And I submit login
   And I wait for 3 seconds
-  When I clck on the page option
+  When I click on the page option
   And I wait for 2 seconds
   When I Click on the new page button
   And I wait for 2 seconds
@@ -21,6 +21,9 @@ Scenario: Con mi usuario y contraseña de ghost quiero crear un sitio exitosamen
   When I click publish
   And I wait for 1 seconds
   When I click publish confirm
+  And I wait for 1 seconds
+  When I click final publish
+  And I wait for 1 seconds
   Then I see the page created
 
   

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Visual Regression Test Report</title>
+    <style>
+      .comparison {
+        margin: 20px;
+        padding: 10px;
+        border: 1px solid #ccc;
+      }
+      .comparison.failed {
+        background-color: #ffebee;
+      }
+      .comparison.passed {
+        background-color: #e8f5e9;
+      }
+      .image-comparison {
+        display: flex;
+        justify-content: space-around;
+      }
+      .image-container {
+        text-align: center;
+      }
+      img {
+        max-width: 300px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Visual Regression Test Report</h1>
+    <div id="comparisons">
+      <script>
+        const comparisons = {{comparisons}};
+        comparisons.forEach(comp => {
+            const div = document.createElement('div');
+            div.className = `comparison ${comp.passed ? 'passed' : 'failed'}`;
+            div.innerHTML = `
+                <h3>${comp.name}</h3>
+                <p>Difference: ${comp.difference}%</p>
+                <p>Different Pixels: ${comp.diffPixels}</p>
+                ${!comp.passed ? `
+                    <div class="image-comparison">
+                        <div class="image-container">
+                            <h4>Version 1</h4>
+                            <img src="${comp.img1Path}" alt="Version 1">
+                        </div>
+                        <div class="image-container">
+                            <h4>Version 2</h4>
+                            <img src="${comp.img2Path}" alt="Version 2">
+                        </div>
+                        <div class="image-container">
+                            <h4>Difference</h4>
+                            <img src="${comp.diffPath}" alt="Difference">
+                        </div>
+                    </div>
+                ` : ''}
+            `;
+            document.getElementById('comparisons').appendChild(div);
+        });
+      </script>
+    </div>
+  </body>
+</html>
