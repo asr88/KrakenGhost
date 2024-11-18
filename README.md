@@ -51,9 +51,12 @@ Pruebas realizadas sobre ghost con kraken-
 - prueba14 (Editar la información de un post)
 - prueba15 (Verificar Edición de información de un post)
 
-```
-# En la semana 6 se trabajó la mejora en las pruuebas realizadas de la semana 5 y se lograron correr dos de las mismas pruebas con la versión de ghost 4.5.0, las pruebas que se lograron    ejecutar son:
+# En la semana 6 se trabajó la mejora en las pruuebas realizadas de la semana 5 de kraken y se implementaron pruebas en Cypress y se lograron correr dos de las mismas pruebas con la versión de ghost 4.5.0, las pruebas que se lograron ejecutar son:
+
+- En el repositorio https://github.com/jdanielkc/PruebasCypress se encuentran las pruebas realizadas en Cypress.
 - prueba 0 (Hacer login)
 - prueba1 (Crear page)
+
+```
 
 ```
