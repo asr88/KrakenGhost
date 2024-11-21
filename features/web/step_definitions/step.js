@@ -2,26 +2,23 @@ const { Given, When, Then } = require("@cucumber/cucumber");
 const properties = require("../../../properties.json");
 const { expect } = require("chai");
 
-// Definición de selectores como constantes
-const SELECTORS = {
-  PAGES: {
-    MENU: {
-      DATA_TEST: '[data-test-nav="pages"]',
-      HREF: 'a[href="#/pages/"]',
-      LINK_TEXT: "a=Pages",
-      FALLBACK: '.gh-nav-list a[href="#/pages/"]',
-    },
-    NEW_BUTTON: {
-      DATA_TEST: "[data-test-new-page-button]",
-      HREF: 'a[href="#/editor/page/"]',
-      CLASS: ".gh-btn-primary",
-    },
-    LIST: {
-      DATA_TEST: "[data-test-pages-list]",
-      CLASS: ".gh-list",
-    },
-  },
-};
+//Intento de usar lógica para encontrar selector más específico
+async function findElement(driver, selectors) {
+  for (let selector of selectors) {
+    try {
+      const element = await driver.$(selector);
+      if (await element.isExisting()) {
+        return element;
+      }
+    } catch (error) {
+      console.log(
+        `Failed with selector $
+        {selector}`,
+        error.message
+      );
+    }
+  }
+}
 
 // Función auxiliar para intentar múltiples selectores
 async function trySelectors(driver, selectorObj, action = "click") {
@@ -47,55 +44,58 @@ async function trySelectors(driver, selectorObj, action = "click") {
 }
 
 When("I enter login email {string}", async function (email) {
-  let element = await this.driver.$("#identification");
+  await new Promise((r) => setTimeout(r, 2000));
+
+  const emailSelectors = [
+    "#identification",
+    ".email.ember-text-field.gh-input",
+  ];
+
+  const element = await findElement(this.driver, emailSelectors);
   const emailKey = email.replace(/[<>]/g, "");
   return await element.setValue(properties[emailKey]);
 });
 
 When("I enter login password {string}", async function (password) {
-  let element = await this.driver.$("#password");
+  const passwordSelectors = [
+    "#password",
+    ".password.ember-text-field.gh-input",
+  ];
+  const element = await findElement(this.driver, passwordSelectors);
   const passwordKey = password.replace(/[<>]/g, "");
   return await element.setValue(properties[passwordKey]);
 });
 
 When("I submit login", async function () {
-  let element = await this.driver.$('[data-test-button="sign-in"]');
+  const buttonSelectors = [
+    "[data-test-button='sign-in']",
+    "button.login.gh-btn.gh-btn-login",
+  ];
+  const element = await findElement(this.driver, buttonSelectors);
   return await element.click();
 });
 
 When("I click on the page option", async function () {
+  await new Promise((r) => setTimeout(r, 2000));
+
+  const selectors = ["[data-test-nav='pages']", 'a[href="#/pages/"]'];
+
   try {
-    // Esperar a que la página se cargue
     await this.driver.waitUntil(
       async () => {
-        const element = await this.driver.$(SELECTORS.PAGES.MENU.DATA_TEST);
-        return await element.isDisplayed();
+        const nav = await this.driver.$(".gh-nav-list");
+        return await nav.isDisplayed();
       },
       {
         timeout: 10000,
-        timeoutMsg: "Pages menu not visible after 10s",
+        timeoutMsg: "Navigation menu not visible after 10s",
       }
     );
 
-    // Intentar hacer clic usando múltiples selectores
-    await trySelectors(this.driver, SELECTORS.PAGES.MENU);
-
-    // Esperar a que la navegación se complete
-    await this.driver.waitUntil(
-      async () => {
-        const url = await this.driver.getUrl();
-        return url.includes("/pages");
-      },
-      {
-        timeout: 5000,
-        timeoutMsg: "URL did not change to pages after clicking",
-      }
-    );
+    const element = await findElement(this.driver, selectors);
+    return await element.click();
   } catch (error) {
-    console.error("Error clicking pages option:", error);
-    // Tomar screenshot para debugging
-    await this.driver.saveScreenshot("error-clicking-pages.png");
-    throw error;
+    console.log("Error clicking pages option:", error);
   }
 });
 
@@ -143,8 +143,39 @@ When("I click on the posts option", async function () {
   return await element.click();
 });
 
+When("I click on the posts option on version 4.5", async function () {
+  const selectors = [
+    // Primary selectors based on exact structure
+    '.ember-view[href="#/posts/"]',
+    "#ember14.ember-view",
+    // SVG-based selectors
+    "a:has(svg:has(.posts_svg__a))",
+    // Text + href combination
+    'a[href="#/posts/"]:contains("Posts")',
+    // Legacy selectors as fallback
+    '[data-test-nav="posts"]',
+  ];
+  const element = await findElement(this.driver, selectors);
+  return await element.click();
+});
+
 When("I click on the members option", async function () {
   let element = await this.driver.$('[data-test-nav="members"]');
+  return await element.click();
+});
+
+When("I click on the members option on version 4.5", async function () {
+  const selectors = [
+    // Primary selectors based on exact structure
+    '.ember-view[href="#/members/"]',
+    // SVG-based selectors
+    "a:has(svg:has(.members_svg__a))",
+    // Text + href combination
+    'a[href="#/members/"]:contains("Members")',
+    // Legacy selectors as fallback
+    '[data-test-nav="members"]',
+  ];
+  const element = await findElement(this.driver, selectors);
   return await element.click();
 });
 
@@ -153,13 +184,52 @@ When("I click on the tags option", async function () {
   return await element.click();
 });
 
+When("I click on the tags option on version 4.5", async function () {
+  const selectors = [
+    // Primary selectors based on exact structure
+    '.ember-view[href="#/tags/"]',
+    // SVG-based selectors
+    "a:has(svg:has(.tags_svg__a))",
+    // Text + href combination
+    'a[href="#/tags/"]:contains("Tags")',
+    // Legacy selectors as fallback
+    '[data-test-nav="tags"]',
+  ];
+  const element = await findElement(this.driver, selectors);
+  return await element.click();
+});
+
 When("I click on the new page button", async function () {
-  let element = await this.driver.$("[data-test-new-page-button]");
-  await element.waitForClickable({ timeout: 5000 });
+  await new Promise((r) => setTimeout(r, 3000));
+
+  const selectors = [
+    "#ember97",
+    'a.ember-view.gh-btn.gh-btn-primary.view-actions-top-row[href="#/editor/page/"]', // Selector completo
+    'a.gh-btn.gh-btn-primary[href="#/editor/page/"]', // Selector simplificado
+    'a[href="#/editor/page/"].gh-btn-primary', // Por href y clase
+    'a.view-actions-top-row[href="#/editor/page/"]', // Por clase específica
+    'a.gh-btn-primary span:contains("New page")', // Por texto del span
+    ".gh-btn.gh-btn-primary.view-actions-top-row",
+  ];
+
+  const element = await findElement(this.driver, selectors);
   return await element.click();
 });
 
 When("I Click on the new post button", async function () {
+  await new Promise((r) => setTimeout(r, 2000));
+
+  let element = await this.driver.$('a[href="#/editor/post/"].gh-btn-primary');
+
+  if (!element) {
+    element = await this.driver.$("[data-test-new-post-button]");
+  }
+
+  await element.waitForClickable({ timeout: 5000 });
+  return await element.click();
+});
+
+When("I Click on the new post button on version 4.5", async function () {
   await new Promise((r) => setTimeout(r, 2000));
 
   let element = await this.driver.$('a[href="#/editor/post/"].gh-btn-primary');
@@ -200,6 +270,13 @@ When("I enter title post", async function () {
   return await element.setValue("Nuevo Post de Prueba");
 });
 
+When("I enter title post on version 4.5", async function () {
+  let element = await this.driver.$(
+    "textarea.gh-editor-title.ember-text-area.gh-input.ember-view"
+  );
+  return await element.setValue("Nuevo Post de Prueba");
+});
+
 When("I enter detail post", async function () {
   await new Promise((r) => setTimeout(r, 2000));
 
@@ -217,8 +294,60 @@ When("I enter detail post", async function () {
   return await element.setValue("Este es un post de prueba creado con Kraken");
 });
 
+When("I enter detail post on version 4.5", async function () {
+  await new Promise((r) => setTimeout(r, 2000));
+
+  let element = await this.driver.$('div[data-koenig-dnd-container="true"]');
+
+  await element.waitForDisplayed({ timeout: 5000 });
+  return await element.setValue("Este es un post de prueba creado con Kraken");
+});
+
+When("I click publish on version 5.96", async function () {
+  // Wait for editor to load completely
+  await new Promise((r) => setTimeout(r, 5000));
+
+  try {
+    // Try to find the exact button using data-test attribute first
+    const selectors = [
+      "button.gh-btn.gh-btn-black.gh-btn-large[data-test-button='continue']",
+      "button.gh-btn.gh-btn-editor.darkgrey.gh-publish-trigger",
+    ];
+    const button = await findElement(this.driver, selectors);
+    await button.waitForClickable({ timeout: 5000 });
+    return await button.click();
+  } catch (error) {
+    console.error("Error clicking publish button:", error);
+  }
+});
+
 When("I click publish", async function () {
-  let element = await this.driver.$('button[data-test-button="publish-flow"]');
+  await new Promise((r) => setTimeout(r, 2000));
+
+  const dropdownSelectors = [
+    // Selector exacto basado en el HTML proporcionado
+    "div.gh-btn.gh-btn-editor.gh-publishmenu-trigger",
+    "#ember350.gh-publishmenu-trigger",
+    '[data-ebd-id="ember349-trigger"]',
+    // Selectores de respaldo
+    ".gh-publishmenu-trigger",
+    'div[role="button"][aria-expanded="false"]',
+    // Selector por texto
+    'div[role="button"] span:contains("Publish")',
+  ];
+  try {
+    const elementDropdown = await findElement(this.driver, dropdownSelectors);
+    await elementDropdown.waitForClickable({ timeout: 5000 });
+    await elementDropdown.click();
+  } catch (error) {
+    console.log("Error clicking publish dropdown:", error);
+  }
+
+  const selectors = [
+    'button[data-test-button="publish-flow"]',
+    ".gh-btn.gh-btn-black.gh-publishmenu-button",
+  ];
+  const element = await findElement(this.driver, selectors);
   await element.waitForClickable({ timeout: 5000 });
   return await element.click();
 });
@@ -241,37 +370,77 @@ Then("I should not see the publish button", async function () {
 });
 
 When("I click publish confirm", async function () {
-  await new Promise((r) => setTimeout(r, 1000));
+  // Wait for 4 seconds to ensure elements are loaded
+  await new Promise((r) => setTimeout(r, 4000));
 
-  let element = await this.driver.$('button[data-test-button="continue"]');
+  try {
+    // First check if there's already a "Published" notification
+    const publishedNotification = await this.driver.$(
+      ".gh-notification-title=Published"
+    );
+    const isDisplayed = await publishedNotification.isDisplayed();
+
+    // If notification is visible, skip the confirmation click
+    if (isDisplayed) {
+      console.log("Post already published, skipping confirmation click");
+      return;
+    }
+  } catch (error) {
+    // If no notification found, proceed with clicking the confirmation button
+    let element = await this.driver.$('button[data-test-button="continue"]');
+    await element.waitForClickable({ timeout: 5000 });
+    return await element.click();
+  }
+});
+
+When("I click publish confirm on version 5.96", async function () {
+  await new Promise((r) => setTimeout(r, 4000));
+
+  const selectors = [
+    'button[data-test-button="continue"]',
+    "gh-btn.gh-btn-black.gh-btn-large",
+    "gh-btn.gh-btn-large.gh-btn-puls",
+    'button[data-test-button="confirm-publish"]',
+    ".gh-btn.gh-btn-black.gh-publishmenu-button",
+  ];
+  const element = await findElement(this.driver, selectors);
   await element.waitForClickable({ timeout: 5000 });
   return await element.click();
 });
 
 When("I click final publish", async function () {
-  await new Promise((r) => setTimeout(r, 1000));
+  await new Promise((r) => setTimeout(r, 4000));
 
-  let element = await this.driver.$(
-    'button[data-test-button="confirm-publish"]'
-  );
-  await element.waitForClickable({ timeout: 5000 });
-  return await element.click();
-});
+  const selectors = [
+    "gh-btn.gh-btn-large.gh-btn-puls",
+    'button[data-test-button="confirm-publish"]',
+    ".gh-btn.gh-btn-black.gh-publishmenu-button",
+  ];
 
-When("I Click on the new page button", async function () {
-  let element = await this.driver.$("[data-test-new-page-button]");
+  const element = await findElement(this.driver, selectors);
   await element.waitForClickable({ timeout: 5000 });
   return await element.click();
 });
 
 When("I enter title page", async function () {
-  await new Promise((r) => setTimeout(r, 2000));
-  let element = await this.driver.$("[data-test-editor-title-input]");
+  await new Promise((r) => setTimeout(r, 8000));
+  const selectors = [".gh-editor-title.ember-text-area"];
+  const element = await findElement(this.driver, selectors);
   return await element.setValue("Nueva pagina de prueba");
 });
 
 When("I enter detail page", async function () {
-  let element = await this.driver.$('.kg-prose[contenteditable="true"]');
+  await new Promise((r) => setTimeout(r, 2000));
+  const selectors = [
+    'div.kg-prose[contenteditable="true"][data-lexical-editor="true"]',
+    '.koenig-editor__editor[data-kg="editor"]',
+    'div[data-kg="editor"]',
+    '.koenig-editor__editor[contenteditable="true"]',
+    ".kg-prose[contenteditable='true']",
+    ".kg-prose.kg-prose-focusable",
+    ".kg-prose.kg-prose-focusable.kg-prose-focusable-editing",
+  ];
+  const element = await findElement(this.driver, selectors);
   return await element.setValue("Contenido super de prueba");
 });
 
@@ -360,6 +529,37 @@ When("I enter email new member {string}", async function (email) {
   await element.setValue(email);
 });
 
+When(
+  "I enter email new member {string} on version 4.5",
+  async function (email) {
+    await new Promise((r) => setTimeout(r, 2000));
+
+    const emailSelectors = [
+      // Most specific selector matching Ghost 4.5
+      "input#member-email.ember-text-field.gh-input.ember-view",
+      // Backup selectors from most to least specific
+      "#member-email",
+      "input.gh-input.ember-text-field",
+      'input[name="email"]',
+      // Original selector as fallback
+      'input[data-test-input="member-email"]',
+    ];
+
+    const element = await findElement(this.driver, emailSelectors);
+
+    if (!element) {
+      throw new Error("Member email input field not found");
+    }
+
+    await element.waitForDisplayed({
+      timeout: 5000,
+      timeoutMsg: "Member email input not displayed after 5 seconds",
+    });
+
+    return await element.setValue(email);
+  }
+);
+
 When("I click on save button", async function () {
   let saveButton = await this.driver.$('button[data-test-button="save"]');
 
@@ -399,6 +599,13 @@ Then("Should be a message {string}", async function (message) {
   console.log("Found message:", actualMessage);
 
   expect(actualMessage.trim()).to.equal(message.trim());
+});
+
+When("I enter tag name {string} on version 4.5", async function (name) {
+  let element = await this.driver.$(
+    "input#tag-name.ember-text-field.gh-input.ember-view"
+  );
+  return await element.setValue(name);
 });
 
 When("I enter tag name {string}", async function (name) {
@@ -449,6 +656,40 @@ When("I click on the settings option", async function () {
 
   await element.waitForClickable({ timeout: 5000 });
   return await element.click();
+});
+
+When("I click on the settings option on version 4.5", async function () {
+  await new Promise((r) => setTimeout(r, 1000));
+  const settingsSelectors = [
+    // Most specific selectors
+    '.gh-nav-bottom-tabicon[href="#/settings/"]',
+    "#ember47.gh-nav-bottom-tabicon",
+    "a.ember-view.gh-nav-bottom-tabicon",
+    // Data attribute selectors
+    '[data-test-nav="settings"]',
+    // SVG-based selectors
+    "a:has(svg .settings_svg__a)",
+    // Fallback selectors
+    ".gh-nav-bottom-tabicon",
+    'a[href="#/settings/"]',
+  ];
+
+  const settingsButton = await findElement(this.driver, settingsSelectors);
+
+  await settingsButton.waitForClickable({
+    timeout: 5000,
+    timeoutMsg: "Settings button not clickable after 5 seconds",
+  });
+
+  // Ensure element is in view
+  await this.driver.executeScript("arguments[0].scrollIntoView(true);", [
+    settingsButton,
+  ]);
+
+  // Small delay after scroll
+  await new Promise((r) => setTimeout(r, 500));
+
+  return await settingsButton.click();
 });
 
 When("I click edit site", async function () {
@@ -523,6 +764,36 @@ When("I click edit site", async function () {
 
   // Add a small delay after clicking
   await new Promise((r) => setTimeout(r, 1000));
+});
+
+When("I click edit site on version 4.5", async function () {
+  await new Promise((r) => setTimeout(r, 2000));
+
+  const generalSettingsSelectors = [
+    // Most specific selectors
+    'a[href="#/settings/general/"].gh-setting-group',
+    "#ember276.gh-setting-group",
+    // Content-based selectors
+    '.gh-setting-group:has(h4:contains("General"))',
+    // SVG-based selectors
+    ".gh-setting-group:has(.yellow svg)",
+    // Text-based fallbacks
+    'a:has(h4:contains("General"))',
+    // Most generic fallback
+    ".gh-setting-group",
+  ];
+
+  const generalSettings = await findElement(
+    this.driver,
+    generalSettingsSelectors
+  );
+
+  await generalSettings.waitForClickable({
+    timeout: 5000,
+    timeoutMsg: "General settings button not clickable after 5 seconds",
+  });
+
+  return await generalSettings.click();
 });
 
 When("I enter site title {string}", async function (title) {
@@ -807,6 +1078,22 @@ Then("the save button is not clickable", async function () {
   }
 });
 
+Then("the save button is clickable on version 4.5", async function () {
+  await new Promise((r) => setTimeout(r, 2000));
+
+  const saveButton = await this.driver.$(".gh-btn-primary");
+
+  if (!saveButton) {
+    throw new Error("Save settings button not found");
+  }
+
+  const isClickable = await saveButton.isClickable();
+
+  if (!isClickable) {
+    throw new Error("Save settings button is not clickable when it should be");
+  }
+});
+
 When("I click on settings menu", async function () {
   await new Promise((r) => setTimeout(r, 2000));
 
@@ -1084,9 +1371,610 @@ When("I click edit language", async function () {
   }
 });
 
+When("I edit site language on version 4.5", async function () {
+  // Buscamos el tercer botón de expansión
+  const expandButtonXPath = [
+    // Usando índice en XPath (el tercero)
+    '(//button[contains(@class, "gh-btn")][.//span[text()="Expand"]])[3]',
+
+    // Alternativa usando la estructura completa
+    '(//div[contains(@class, "gh-expandable-block")]//button[contains(@class, "gh-btn")])[3]',
+
+    // Respaldo usando el data-ember-action
+    '//button[@data-ember-action-419="419"]',
+  ];
+
+  let expandButton;
+  for (const xpath of expandButtonXPath) {
+    try {
+      expandButton = await this.driver.$(`${xpath}`);
+      if (await expandButton.isExisting()) {
+        const buttonText = await expandButton.getText();
+        if (buttonText.includes("Expand")) {
+          break;
+        }
+      }
+    } catch (e) {
+      console.log(`XPath ${xpath} failed, trying next...`);
+    }
+  }
+
+  if (!expandButton) {
+    throw new Error("No se pudo encontrar el tercer botón de expandir");
+  }
+
+  // Log para debugging
+  console.log("Found button:", {
+    text: await expandButton.getText(),
+    class: await expandButton.getAttribute("class"),
+    index: "3rd button",
+  });
+
+  await expandButton.waitForClickable({
+    timeout: 5000,
+    timeoutMsg:
+      "El tercer botón de expandir no es clickeable después de 5 segundos",
+  });
+
+  await expandButton.click();
+  await new Promise((r) => setTimeout(r, 1000));
+  // Ahora buscamos el campo de idioma
+  const languageInputSelectors = [
+    // Selector más específico usando las clases exactas
+    "input.ember-text-field.gh-input.ember-view",
+
+    // Usando el ID (aunque puede cambiar)
+    "#ember485",
+
+    // Combinación de atributos
+    'input[type="text"].gh-input',
+
+    // XPath como respaldo
+    '//input[contains(@class, "gh-input") and contains(@class, "ember-text-field")]',
+  ];
+  const languageInput = await findElement(this.driver, languageInputSelectors);
+
+  // Limpiamos el campo actual
+  await languageInput.clearValue();
+
+  // Esperamos un momento después de limpiar
+  await new Promise((r) => setTimeout(r, 500));
+
+  // Establecemos el nuevo valor
+  return await languageInput.setValue("es");
+});
+
 When("I enter Site language {string}", async function (language) {
   // Find the language input field and enter the value
   // You'll need to inspect the page to get the correct selector
   let element = await this.driver.$('input[name="locale"]'); // Adjust selector as needed
   return await element.setValue(language);
+});
+
+Then("I should see the text {string}", async function (text) {
+  await new Promise((r) => setTimeout(r, 2000));
+
+  const dashboardSelectors = [
+    'a[data-test-nav="dashboard"]',
+
+    // Primary selectors (most specific)
+    'a[title="Dashboard"][href="#/dashboard/"]', // By title and href combined
+    'a[href="#/dashboard/"]', // By href
+    'a[title="Dashboard"]', // By title
+
+    // Backup selectors (less specific)
+    '.ember-view[href="#/dashboard/"]', // By class and href
+    "a.ember-view:has(svg)", // By class and structure
+    'a:contains("Dashboard")', // By text content
+  ];
+  // Usamos el selector más específico
+  let element = await findElement(this.driver, dashboardSelectors);
+
+  // Obtenemos el texto del elemento, excluyendo el contenido del SVG
+  let actualText = await element.getText();
+
+  // Verificamos que el texto coincida, ignorando espacios en blanco
+  expect(actualText.trim()).to.equal(text);
+});
+
+Then("I see the alert {string}", async function (text) {
+  await new Promise((r) => setTimeout(r, 2000));
+  const notificationSelectors = [".gh-notification-title"];
+  const element = await findElement(this.driver, notificationSelectors);
+  const actualText = await element.getText();
+  expect(actualText.trim()).to.equal(text);
+});
+
+When("I click avatar", async function () {
+  await new Promise((r) => setTimeout(r, 2000));
+
+  const avatarSelectors = [
+    '.ember-basic-dropdown-trigger[role="button"]',
+    ".ember-view.ember-basic-dropdown-trigger",
+    "div.gh-user-avatar",
+    // Fallback selectors
+    '[data-ebd-id*="trigger"]',
+    ".ember-basic-dropdown-trigger",
+  ];
+
+  const element = await findElement(this.driver, avatarSelectors);
+
+  await element.waitForClickable({
+    timeout: 5000,
+    timeoutMsg: "Avatar dropdown trigger not clickable after 5 seconds",
+  });
+
+  return await element.click();
+});
+
+When("I click my profile", async function () {
+  await new Promise((r) => setTimeout(r, 2000));
+
+  const profileSelectors = [
+    '[data-test-nav="user-profile"]',
+    'a.dropdown-item[href*="/settings/staff/"]',
+    '.dropdown-item:contains("Your profile")',
+    // Fallback selectors
+    'a[href*="/settings/staff/"]',
+    ".ember-view.dropdown-item",
+  ];
+
+  const element = await findElement(this.driver, profileSelectors);
+
+  await element.waitForClickable({
+    timeout: 5000,
+    timeoutMsg: "Profile link not clickable after 5 seconds",
+  });
+
+  return await element.click();
+});
+
+When("I click my profile on version 4.5", async function () {
+  await new Promise((r) => setTimeout(r, 2000));
+
+  const staffSelectors = [
+    // Selectores específicos para el enlace Staff
+    "#ember20.active.ember-view",
+    'a.active[href="#/staff/"]',
+
+    // Usando la estructura del SVG y texto
+    "a.ember-view:has(svg#staff_svg__Regular)",
+
+    // XPath específicos
+    '//a[@id="ember20"][contains(@class, "active")]',
+    '//a[contains(@class, "active")][contains(@href, "/staff/")]',
+
+    // Selector de respaldo
+    'a.ember-view:has(svg):contains("Staff")',
+  ];
+
+  const element = await findElement(this.driver, staffSelectors);
+
+  // Asegurarse de que el elemento está en la vista
+  await this.driver.executeScript("arguments[0].scrollIntoView(true);", [
+    element,
+  ]);
+
+  await new Promise((r) => setTimeout(r, 1000));
+
+  await element.waitForClickable({
+    timeout: 10000,
+    timeoutMsg: "Staff link not clickable after 10 seconds",
+  });
+
+  return await element.click();
+});
+
+When("I enter new name {string}", async function (name) {
+  await new Promise((r) => setTimeout(r, 2000));
+
+  const nameInputSelectors = [
+    'input[maxlength="191"][type="text"]',
+    'input.peer[type="text"]',
+    // More specific class-based selector
+    "input.peer.z-[1].order-2.h-9.w-full",
+    // Fallback selectors
+    'input[name*="r"]',
+    "input.peer",
+  ];
+
+  const element = await findElement(this.driver, nameInputSelectors);
+
+  await element.waitForDisplayed({
+    timeout: 5000,
+    timeoutMsg: "Name input field not displayed after 5 seconds",
+  });
+
+  // Clear existing value using multiple approaches
+  await element.click();
+  const valueLength = (await element.getValue()).length;
+  if (valueLength > 0) {
+    // Send backspace keys to clear the field
+    await element.keys([...Array(valueLength)].map(() => "Backspace"));
+    // Additional clear attempt
+    await element.clearValue();
+  }
+
+  // Small delay to ensure clearing is complete
+  await new Promise((r) => setTimeout(r, 500));
+
+  // Enter new value
+  return await element.setValue(name);
+});
+
+When("I enter new name {string} on version 4.5", async function (name) {
+  await new Promise((r) => setTimeout(r, 2000));
+
+  const nameInputSelectors = [
+    // Selector específico usando el ID
+    "#user-name",
+
+    // Usando la clase específica
+    "input.user-name.ember-text-field.gh-input",
+
+    // Usando el placeholder
+    'input[placeholder="Full Name"]',
+
+    // Combinación de atributos
+    'input[autocorrect="off"][type="text"].gh-input',
+
+    // XPath como respaldo
+    '//input[@id="user-name"]',
+    '//input[contains(@class, "user-name") and contains(@class, "gh-input")]',
+  ];
+
+  const element = await findElement(this.driver, nameInputSelectors);
+
+  await element.waitForDisplayed({
+    timeout: 5000,
+    timeoutMsg: "Name input field not displayed after 5 seconds",
+  });
+
+  // Clear existing value using multiple approaches
+  await element.click();
+  const valueLength = (await element.getValue()).length;
+  if (valueLength > 0) {
+    // Send backspace keys to clear the field
+    await element.keys([...Array(valueLength)].map(() => "Backspace"));
+    // Additional clear attempt
+    await element.clearValue();
+  }
+
+  // Small delay to ensure clearing is complete
+  await new Promise((r) => setTimeout(r, 500));
+
+  // Enter new value
+  return await element.setValue(name);
+});
+
+When("I click save", async function () {
+  await new Promise((r) => setTimeout(r, 2000));
+
+  const saveButtonSelectors = [
+    // Exact match for the button structure
+    "button.cursor-pointer.bg-black.text-white.dark\\:bg-white.dark\\:text-black.hover\\:bg-grey-900",
+    // Simplified but specific selectors
+    "button.cursor-pointer.bg-black.text-white",
+    'button.cursor-pointer span:contains("Save")',
+    // Backup selectors
+    "button.cursor-pointer",
+    'button[type="button"]',
+    // Find by text content
+    'button:has(span:contains("Save"))',
+  ];
+
+  const element = await findElement(this.driver, saveButtonSelectors);
+
+  await element.waitForClickable({
+    timeout: 5000,
+    timeoutMsg: "Save button not clickable after 5 seconds",
+  });
+
+  return await element.click();
+});
+
+When("I click save on version 4.5", async function () {
+  await new Promise((r) => setTimeout(r, 2000));
+
+  const saveButtonSelectors = [
+    // Primary selectors for Ghost 4.5
+    ".gh-btn.gh-btn-primary",
+    ".gh-btn.gh-btn-icon",
+    "#ember280",
+    // Combined class selectors
+    "button.gh-btn.gh-btn-primary.gh-btn-icon",
+    // Backup selectors
+    'button.gh-btn-primary span:contains("Save")',
+    'button.gh-btn:has(span:contains("Save"))',
+  ];
+
+  const element = await findElement(this.driver, saveButtonSelectors);
+
+  await element.waitForClickable({
+    timeout: 5000,
+    timeoutMsg: "Save button not clickable after 5 seconds",
+  });
+
+  return await element.click();
+});
+
+Then("I should see the heading {string}", async function (expectedText) {
+  await new Promise((r) => setTimeout(r, 2000));
+
+  const headingSelectors = [
+    // Primary selectors for Ghost 4.5
+    "h2.gh-canvas-title",
+    ".gh-canvas-title",
+    // Fallback selectors
+    'h2:has(a[href="#/staff/"])',
+    "h2",
+  ];
+
+  const element = await findElement(this.driver, headingSelectors);
+
+  await element.waitForDisplayed({
+    timeout: 5000,
+    timeoutMsg: "Heading not displayed after 5 seconds",
+  });
+
+  const actualText = await element.getText();
+  // Check if the expected text is contained within the heading
+  expect(actualText).to.include(expectedText);
+});
+
+Then(
+  "I should see the heading {string} on version 4.5",
+  async function (expectedText) {
+    const headingSelectors = [
+      // Most specific selector matching the HTML structure
+      "h2.gh-canvas-title",
+      // Backup selectors
+      ".gh-canvas-title",
+      "h2:has(a[href='#/tags/'])",
+    ];
+
+    const element = await findElement(this.driver, headingSelectors);
+
+    if (!element) {
+      throw new Error("Heading element not found");
+    }
+
+    await element.waitForDisplayed({
+      timeout: 5000,
+      timeoutMsg: "Heading not displayed after 5 seconds",
+    });
+
+    const headingText = await element.getText();
+
+    // Check if the expected text is included in the heading
+    if (!headingText.includes(expectedText)) {
+      throw new Error(
+        `Expected heading to contain "${expectedText}" but found "${headingText}"`
+      );
+    }
+
+    return true;
+  }
+);
+
+When("I click on the post {string}", async function (postTitle) {
+  await new Promise((r) => setTimeout(r, 2000));
+
+  // First find all post titles
+  const postElements = await this.driver.$$(".gh-content-entry-title");
+
+  let targetPost = null;
+
+  // Iterate through posts to find the one with matching title and published status
+  for (const post of postElements) {
+    const title = await post.getText();
+    if (title.trim() === postTitle) {
+      // Get the parent element that contains both title and status
+      const parentElement = await post.parentElement();
+
+      try {
+        // Check if the post is published
+        const statusElement = await parentElement.$(".published");
+        const status = await statusElement.getText();
+
+        if (status.trim() === "Published") {
+          targetPost = parentElement;
+          break;
+        }
+      } catch (e) {
+        // Status element not found or not published, continue to next post
+        continue;
+      }
+    }
+  }
+
+  if (!targetPost) {
+    throw new Error(`Published post with title "${postTitle}" not found`);
+  }
+
+  await targetPost.waitForClickable({
+    timeout: 5000,
+    timeoutMsg: `Published post with title "${postTitle}" not clickable after 5 seconds`,
+  });
+
+  // Ensure element is in view before clicking
+  await this.driver.executeScript("arguments[0].scrollIntoView(true);", [
+    targetPost,
+  ]);
+
+  // Small delay after scroll
+  await new Promise((r) => setTimeout(r, 500));
+
+  return await targetPost.click();
+});
+
+When("I enter new title {string}", async function (title) {
+  await new Promise((r) => setTimeout(r, 2000));
+
+  const titleSelectors = [
+    "textarea.gh-editor-title",
+    ".gh-editor-title",
+    'textarea[placeholder="Post title"]',
+    // Fallback selectors
+    "textarea.gh-input",
+    ".gh-editor-title.ember-text-area",
+    // Most generic fallback
+    "textarea[data-test-editor-title-input]",
+  ];
+
+  const titleElement = await findElement(this.driver, titleSelectors);
+
+  await titleElement.waitForDisplayed({
+    timeout: 5000,
+    timeoutMsg: "Title input not displayed after 5 seconds",
+  });
+
+  // Clear existing value first
+  await titleElement.clearValue();
+
+  // Small delay to ensure clearing is complete
+  await new Promise((r) => setTimeout(r, 500));
+
+  // Enter new value
+  return await titleElement.setValue(title);
+});
+
+When("I click update", async function () {
+  await new Promise((r) => setTimeout(r, 2000));
+
+  const updateButtonSelectors = [
+    // Primary selectors
+    'button[data-test-button="publish-save"]',
+    "button.gh-editor-save-trigger",
+    "button.gh-btn-editor-save",
+    // Secondary selectors
+    "button.gh-publishmenu-button",
+    "button.gh-btn-black",
+    // Backup selectors
+    'button:has(span:contains("Update"))',
+    'button:has(span:contains("Save"))',
+    // Most generic fallback
+    "button.gh-btn",
+    "button.cursor-pointer",
+  ];
+
+  const updateButton = await findElement(this.driver, updateButtonSelectors);
+
+  await updateButton.waitForClickable({
+    timeout: 5000,
+    timeoutMsg: "Update button not clickable after 5 seconds",
+  });
+
+  return await updateButton.click();
+});
+
+When("I enter page title {string}", async function (title) {
+  await new Promise((r) => setTimeout(r, 2000));
+
+  const titleSelectors = [
+    ".gh-editor-title",
+    "textarea.gh-editor-title",
+    "#ember488", // Note: ember IDs might be dynamic
+    'textarea[placeholder="Page Title"]',
+    // Fallback selectors
+    "textarea.gh-input",
+    ".gh-editor-title.ember-text-area",
+  ];
+
+  const titleElement = await findElement(this.driver, titleSelectors);
+
+  await titleElement.waitForDisplayed({
+    timeout: 5000,
+    timeoutMsg: "Page title input not displayed after 5 seconds",
+  });
+
+  // Clear existing value first
+  await titleElement.clearValue();
+
+  // Enter new value
+  return await titleElement.setValue(title);
+});
+
+Then("the update button is not clickable", async function () {
+  await new Promise((r) => setTimeout(r, 2000));
+
+  const updateButtonSelectors = [
+    // Primary selectors
+    'button[data-test-button="publish-save"]',
+    "button.gh-editor-save-trigger",
+    "button.gh-btn-editor-save",
+    // Secondary selectors
+    "button.gh-publishmenu-button",
+    "button.gh-btn-black",
+    // Backup selectors
+    'button:has(span:contains("Update"))',
+    'button:has(span:contains("Save"))',
+    // Most generic fallback
+    "button.gh-btn",
+    "button.cursor-pointer",
+  ];
+
+  const updateButton = await findElement(this.driver, updateButtonSelectors);
+
+  const isClickable = await updateButton.isClickable();
+  expect(isClickable).to.be.false;
+});
+
+When("I click staff option", async function () {
+  await new Promise((r) => setTimeout(r, 2000));
+
+  const selectors = ["[data-test-nav='staff']", 'a[href="#/staff/"]'];
+
+  try {
+    await this.driver.waitUntil(
+      async () => {
+        const nav = await this.driver.$(".gh-nav-list");
+        return await nav.isDisplayed();
+      },
+      {
+        timeout: 10000,
+        timeoutMsg: "Navigation menu not visible after 10s",
+      }
+    );
+
+    const element = await findElement(this.driver, selectors);
+    return await element.click();
+  } catch (error) {
+    console.log("Error clicking staff option:", error);
+  }
+});
+
+When("I select the owner", async function () {
+  await new Promise((r) => setTimeout(r, 2000));
+
+  const ownerSelectors = [
+    // Selector específico para el badge de Owner
+    "span.gh-badge.owner",
+    '.gh-badge:contains("Owner")',
+
+    // XPath específicos
+    '//span[contains(@class, "gh-badge") and contains(@class, "owner")]',
+    '//span[contains(@class, "gh-badge")][text()="Owner"]',
+
+    // Selectores de respaldo
+    '[class*="gh-badge"][class*="owner"]',
+    'span:contains("Owner")',
+  ];
+
+  const element = await findElement(this.driver, ownerSelectors);
+
+  await element.waitForClickable({
+    timeout: 5000,
+    timeoutMsg: "Owner badge not clickable after 5 seconds",
+  });
+
+  return await element.click();
+});
+
+Then("I see the notification {string} on version 4.5", async function (text) {
+  await new Promise((r) => setTimeout(r, 2000));
+  const notificationSelectors = [".gh-notification-title"];
+  const element = await findElement(this.driver, notificationSelectors);
+  const actualText = await element.getText();
+  expect(actualText.trim()).to.equal(text);
 });

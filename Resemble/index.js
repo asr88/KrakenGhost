@@ -5,13 +5,152 @@ const sharp = require("sharp");
 class ImageComparator {
   constructor() {
     this.version1Path = path.join(__dirname, "./screenshot/4_5");
-    this.version2Path = path.join(__dirname, "./screenshot/latest");
-    this.resultPath = path.join(__dirname, "results");
+    this.version2Path = path.join(__dirname, "./screenshot/5_96");
+    this.resultPath = path.join(__dirname, "./screenshot/compare");
     this.threshold = 0.1;
+  }
 
-    console.log("Version 1 Path:", this.version1Path);
-    console.log("Version 2 Path:", this.version2Path);
-    console.log("Results Path:", this.resultPath);
+  // New method to get folder structure
+  async getFolderStructure(basePath) {
+    const structure = new Map();
+
+    async function traverse(currentPath, relativePath = "") {
+      const items = await fs.readdir(currentPath, { withFileTypes: true });
+
+      for (const item of items) {
+        const fullPath = path.join(currentPath, item.name);
+        const relPath = path.join(relativePath, item.name);
+
+        if (item.isDirectory()) {
+          structure.set(relPath, {
+            type: "directory",
+            files: [],
+          });
+          await traverse(fullPath, relPath);
+        } else if (item.isFile() && item.name.toLowerCase().endsWith(".png")) {
+          const parentDir = relativePath || ".";
+          if (!structure.has(parentDir)) {
+            structure.set(parentDir, {
+              type: "directory",
+              files: [],
+            });
+          }
+          structure.get(parentDir).files.push(item.name);
+        }
+      }
+    }
+
+    await traverse(basePath);
+    return structure;
+  }
+
+  async run() {
+    try {
+      console.log("\n=== Analyzing Directory Structures ===");
+
+      // Get folder structures for both versions
+      const structure1 = await this.getFolderStructure(this.version1Path);
+      const structure2 = await this.getFolderStructure(this.version2Path);
+
+      // Compare structures
+      const comparisons = [];
+      let structuresMatch = true;
+
+      console.log("\nChecking folder structures:");
+      for (const [folderPath, content1] of structure1) {
+        const content2 = structure2.get(folderPath);
+
+        if (!content2) {
+          console.log(`❌ Folder missing in version 2: ${folderPath}`);
+          structuresMatch = false;
+          continue;
+        }
+
+        // Create the corresponding folder in compare directory
+        const compareFolder = path.join(this.resultPath, folderPath);
+        await fs.ensureDir(compareFolder);
+        console.log(`✅ Created folder: ${compareFolder}`);
+
+        // Compare PNG files in this folder
+        const files1 = new Set(content1.files);
+        const files2 = new Set(content2.files);
+
+        for (const file of files1) {
+          if (!files2.has(file)) {
+            console.log(
+              `❌ File missing in version 2: ${path.join(folderPath, file)}`
+            );
+            structuresMatch = false;
+            continue;
+          }
+
+          // Compare the images
+          try {
+            const img1Path = path.join(this.version1Path, folderPath, file);
+            const img2Path = path.join(this.version2Path, folderPath, file);
+            const diffPath = path.join(
+              this.resultPath,
+              folderPath,
+              `diff_${file}`
+            );
+
+            console.log(`\nComparing: ${path.join(folderPath, file)}`);
+            const comparison = await this.compareImages(
+              img1Path,
+              img2Path,
+              diffPath
+            );
+
+            comparisons.push({
+              fileName: path.join(folderPath, file),
+              ...comparison,
+              passed: comparison.diffPercentage <= this.threshold,
+            });
+
+            console.log(
+              `✅ Comparison complete: ${comparison.diffPercentage}% difference`
+            );
+          } catch (error) {
+            console.error(`❌ Error comparing ${file}:`, error.message);
+          }
+        }
+
+        // Check for extra files in version 2
+        for (const file of files2) {
+          if (!files1.has(file)) {
+            console.log(
+              `⚠️ Extra file in version 2: ${path.join(folderPath, file)}`
+            );
+            structuresMatch = false;
+          }
+        }
+      }
+
+      // Check for extra folders in version 2
+      for (const [folderPath] of structure2) {
+        if (!structure1.has(folderPath)) {
+          console.log(`⚠️ Extra folder in version 2: ${folderPath}`);
+          structuresMatch = false;
+        }
+      }
+
+      // Generate report and print summary
+      const results = {
+        totalComparisons: comparisons.length,
+        passed: comparisons.filter((c) => c.passed).length,
+        failed: comparisons.filter((c) => !c.passed).length,
+        structuresMatch,
+        details: comparisons,
+      };
+
+      await this.generateReport(results);
+      this.printSummary(results);
+
+      return results;
+    } catch (error) {
+      console.error("Error during comparison process:", error);
+      throw error;
+    }
   }
 
   async compareImages(img1Path, img2Path, outputPath) {
@@ -84,48 +223,6 @@ class ImageComparator {
       console.error(`Error comparing images: ${error}`);
       throw error;
     }
-  }
-
-  async run() {
-    const comparisons = [];
-    const files = await fs.readdir(this.version1Path);
-
-    console.log("\n=== Starting Image Comparisons ===");
-    console.log(`Found ${files.length} files in version 1 directory\n`);
-
-    for (const file of files) {
-      console.log("\n----------------------------------------");
-      console.log(`Checking file: ${file}`);
-
-      // Skip files that don't end with .png (case insensitive)
-      if (!file.toLowerCase().endsWith(".png")) {
-        console.log(`❌ Skipping ${file} - not a PNG file`);
-        continue;
-      }
-
-      try {
-        const img1Path = path.join(this.version1Path, file);
-        const img2Path = path.join(this.version2Path, file);
-
-        console.log("\nPaths to compare:");
-        console.log(`Version 1: ${img1Path}`);
-        console.log(`Version 2: ${img2Path}`);
-
-        // Check if version 2 file exists
-        if (!(await fs.pathExists(img2Path))) {
-          console.log(
-            `❌ Skipping comparison - File not found in version 2: ${file}`
-          );
-          continue;
-        }
-
-        // ... rest of the comparison code ...
-      } catch (error) {
-        console.error(`❌ Error processing ${file}: ${error.message}`);
-      }
-    }
-
-    // ... rest of the function ...
   }
 
   async generateReport(results) {
@@ -291,8 +388,6 @@ async function main() {
   const directoriesExist = await verifyDirectories();
   if (directoriesExist) {
     const comparator = new ImageComparator();
-    const testImagePath = path.join(comparator.version1Path, "Paso_1.png");
-    await testImage(testImagePath);
     await comparator.run();
   }
 }

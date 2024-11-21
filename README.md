@@ -23,6 +23,7 @@ Pruebas realizadas sobre ghost con kraken-
 - Para ejecutar cada escenario, se debe llevar uno a uno de la carpeta **/all_features** a la carpeta **/features** y regresarlo a medida que lo haya ejecutado.
 - Ejecutar el comando **npx kraken-node run**, esto ejecutar el escenario correspondiente.
 - Para cambiar la versión de ghost se debe modificar el archivo properties.json a la URL donde se encuentra la versión de ghost que se desea probar. Es importante que modificar los hooks usados para generar los screenshots de acuerdo a la versión de ghost que se este utilizando, para más adelante poder ejecutar el reporte de comparación de imagenes con mayor facilidad.
+- Para facilidad en la ejecución de los escenarios de kraken se crearon dos scripts de powershell que se encuentran en el root del proyecto y se llaman run_features_4_5.ps1 y run_features_5_96.ps1, estos scripts ejecutan todos los escenarios de kraken para las versiones 4.5.0 y 5.96.0 de ghost respectivamente.
 
 # Pasos para ejecutar el reporte de comparación de imagenes:
 

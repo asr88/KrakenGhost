@@ -1,10 +1,10 @@
 {
   "USERNAME1": "asr@hotmail.com",
   "PASSWORD1": "contraseña123",
-  "URL": "http://localhost:2368/ghost/#/signin",
-  "POST": "http://localhost:2368/#/posts/",
-  "EDITORPOST": "http://localhost:2368/#/editor/post/",
-  "PAGE": "http://localhost:2368/#/pages/",
-  "EDITORPAGE": "http://localhost:2368/#/editor/page/",
+  "URL": "http://localhost:3002/ghost/#/signin",
+  "POST": "http://localhost:3002/#/posts/",
+  "EDITORPOST": "http://localhost:3002/#/editor/post/",
+  "PAGE": "http://localhost:3002/#/pages/",
+  "EDITORPAGE": "http://localhost:300/#/editor/page/",
   "FILEPATH": "../generate-data/aprioriLogin.csv"
 }

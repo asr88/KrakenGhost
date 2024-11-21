@@ -19,7 +19,7 @@ After(async function () {
 AfterStep(async function (Scenario) {
   const fs = require("fs");
   const folderPath =
-    "./reports/screenshot/latest/" + Scenario.pickle.name.replace(/\s/g, "");
+    "./reports/screenshot/4_5/" + Scenario.pickle.name.replace(/\s/g, "");
 
   if (!fs.existsSync(folderPath)) {
     fs.mkdir(folderPath, { recursive: true }, (error) => {
@@ -31,7 +31,7 @@ AfterStep(async function (Scenario) {
     });
   }
   await this.driver.saveScreenshot(
-    "./reports/screenshot/latest/" +
+    "./reports/screenshot/4_5/" +
       Scenario.pickle.name.replace(/\s/g, "") +
       "/Paso_" +
       counter +
