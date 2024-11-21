@@ -7,7 +7,7 @@ Pruebas realizadas sobre ghost con kraken-
 # Requisitos:
 
 - Node
-- Ghost latest version y ghost version 4.5.0
+- Ghost version 5.96 y ghost version 4.5.0
 - Tener un usuario registrado en el aplicativo ghost
 
 # Pasos para correr los escenarios de pruebas:
