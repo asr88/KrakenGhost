@@ -1,0 +1,230 @@
+{
+  "pages": {
+    "normal": [
+      {
+        "type": "valid",
+        "title": "Normal Page Title",
+        "content": "This is normal content",
+        "expectedResult": "success",
+        "description": "Standard valid page"
+      },
+      {
+        "type": "valid_minimal",
+        "title": "Basic",
+        "content": "Test",
+        "expectedResult": "success",
+        "description": "Minimal valid page"
+      }
+    ],
+    "boundary": [
+      {
+        "type": "max_length",
+        "title": "This is a title with exactly 255 characters. It is designed to test the maximum length allowed for a page title in Ghost. We need to make sure that the system can handle titles that are exactly at the boundary limit. This is a very long title that should be exactly at the character limit for testing purposes.",
+        "content": "Normal content",
+        "expectedResult": "error",
+        "description": "Maximum length title"
+      },
+      {
+        "type": "special_chars",
+        "title": "!@#$%^&*()_+{}|:\"<>?[],./;'\\",
+        "content": "Content with !@#$%^&*()",
+        "expectedResult": "success",
+        "description": "Special characters"
+      },
+      {
+        "type": "html_injection",
+        "title": "<script>alert('test')</script>",
+        "content": "<h1>Test</h1>",
+        "expectedResult": "sanitized",
+        "description": "HTML injection attempt"
+      },
+      {
+        "type": "unicode",
+        "title": "título の 页面 테스트 🌟 💻",
+        "content": "Multi-language content テスト",
+        "expectedResult": "success",
+        "description": "Unicode characters"
+      }
+    ],
+    "empty": [
+      {
+        "type": "both_empty",
+        "title": "",
+        "content": "",
+        "expectedResult": "error",
+        "validationMessage": "Title and content required",
+        "description": "Both fields empty"
+      },
+      {
+        "type": "empty_email_test",
+        "email": "",
+        "content": "Valid content",
+        "expectedResult": "error",
+        "validationMessage": "Email is required",
+        "description": "Empty email test case"
+      },
+      {
+        "type": "empty_title_test",
+        "title": "",
+        "content": "Valid content",
+        "expectedResult": "error",
+        "validationMessage": "Title is required",
+        "description": "Empty title test case"
+      },
+      {
+        "type": "emty_content_test",
+        "title": "Valid Title",
+        "content": "",
+        "expectedResult": "error",
+        "validationMessage": "Content is required",
+        "description": "Empty content test case"
+      },
+      {
+        "type": "empty_title_case",
+        "title": "",
+        "content": "Some content here",
+        "expectedResult": "error",
+        "validationMessage": "Title is required",
+        "description": "Empty title test case"
+      },
+      {
+        "type": "empty_title",
+        "title": "",
+        "content": "Valid content",
+        "expectedResult": "error",
+        "validationMessage": "Title is required",
+        "description": "Empty title only"
+      },
+      {
+        "type": "whitespace_title",
+        "title": "    ",
+        "content": "Valid content",
+        "expectedResult": "error",
+        "validationMessage": "Title cannot be blank",
+        "description": "Whitespace title"
+      },
+      {
+        "type": "special_empty",
+        "title": "\n\t\r",
+        "content": "\u200B",
+        "expectedResult": "error",
+        "validationMessage": "Invalid characters",
+        "description": "Special whitespace characters"
+      }
+    ],
+    "metadata": {
+      "tags": [
+        {
+          "name": "Valid Tag",
+          "description": "Normal tag"
+        },
+        {
+          "name": "",
+          "description": "Empty tag"
+        },
+        {
+          "name": "#Test@Tag",
+          "description": "Special characters in tag"
+        }
+      ],
+      "seo": [
+        {
+          "type": "valid",
+          "value": "This is a normal content for the page.",
+          "description": "Standard valid content"
+        },
+        {
+          "type": "long",
+          "value": "Lorem ipsum Lorem ipsum Lorem ipsum...",
+          "description": "Very long content"
+        },
+        {
+          "type": "markdown",
+          "value": "# Heading\n## Subheading\n* List item 1\n* List item 2\n```code block```",
+          "description": "Content with markdown"
+        },
+        {
+          "type": "html",
+          "value": "<div><h1>Test</h1><p>Paragraph</p><script>alert('test')</script></div>",
+          "description": "Content with HTML"
+        },
+        {
+          "type": "empty",
+          "value": "",
+          "description": "Empty content"
+        }
+      ]
+    }
+  },
+  "users": {
+    "valid": [
+      {
+        "email": "valid@email.com",
+        "password": "ValidPass123!",
+        "description": "Valid credentials"
+      }
+    ],
+    "invalid": [
+      {
+        "email": "invalid@email",
+        "password": "short",
+        "description": "Invalid format"
+      },
+      {
+        "email": "",
+        "password": "ValidPass123!",
+        "description": "Empty email"
+      },
+      {
+        "email": "valid@email.com",
+        "password": "",
+        "description": "Empty password"
+      }
+    ]
+  },
+  "metadata": {
+    "tags": [
+      {
+        "name": "Valid Tag",
+        "description": "A normal tag"
+      },
+      {
+        "name": "#TestTag",
+        "description": "Tag with special character"
+      },
+      {
+        "name": "",
+        "description": "Empty tag"
+      }
+    ],
+    "seo": [
+      {
+        "metaTitle": "Valid Meta Title",
+        "metaDescription": "Valid meta description for SEO purposes",
+        "canonicalUrl": "https://valid-url.com"
+      },
+      {
+        "metaTitle": "",
+        "metaDescription": "Description without title",
+        "canonicalUrl": "https://valid-url.com"
+      }
+    ]
+  },
+  "empty_title_test": {
+    "title": "",
+    "content": "This is test content for empty title case"
+  },
+  "email_without_arroba": {
+    "email": "asdasdashotmail.com"
+  },
+  "email_without_dotcom": {
+    "email": "asdasdas@hotmail"
+  },
+  "empty_email_test": {
+    "email": ""
+  },
+  "emty_content_test": {
+    "title": "Test Title",
+    "content": ""
+  }
+}

@@ -3,17 +3,34 @@
     "Resemble"
   ],
   "scripts": {
-    "test": "npm test --workspace=Resemble"
+    "test": "npm test --workspace=Resemble",
+    "test:static": "cucumber-js --tags @static-data",
+    "test:faker": "cucumber-js --tags @dynamic-data --profile web && node features/web/support/reporter.js",
+    "test:faker:mobile": "cucumber-js --tags @dynamic-data --profile mobile",
+    "test:all": "cucumber-js",
+    "test:regression": "cucumber-js --tags @regression",
+    "kraken:static": "npx kraken-node run --tags @static-data",
+    "kraken:faker": "npx kraken-node run --tags @dynamic-data",
+    "report": "node features/web/support/reporter.js",
+    "test:apriori": "cucumber-js --tags \"@a-priori\"",
+    "test:apriori:web": "cucumber-js --tags \"@a-priori and @web\"",
+    "test:apriori:boundary": "cucumber-js --tags \"@a-priori and @boundary\"",
+    "test:apriori:empty": "cucumber-js --tags \"@a-priori and @empty-data\""
   },
   "dependencies": {
     "@cucumber/cucumber": "^7.2.1",
+    "@faker-js/faker": "^9.2.0",
     "axios": "^1.4.0",
     "csv-parser": "^3.0.0",
-    "faker": "^6.6.6",
-    "fs": "^0.0.1-security",
-    "kraken-node": "^1.0.24"
+    "fs-extra": "^11.1.1",
+    "kraken-node": "^1.0.24",
+    "path": "^0.12.7"
   },
   "devDependencies": {
-    "chai": "^4.3.4"
+    "chai": "^4.3.4",
+    "chromedriver": "^131.0.1",
+    "cucumber-html-reporter": "^7.1.0",
+    "multiple-cucumber-html-reporter": "^3.8.0",
+    "selenium-webdriver": "^4.26.0"
   }
 }
