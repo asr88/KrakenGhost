@@ -63,79 +63,83 @@ Pruebas realizadas sobre ghost con kraken-
 - prueba 0 (Hacer login)
 - prueba1 (Crear page)
 
-```
 # Entrega semana 7
+
 - Se crean escenarios para pruebas realizadas usando faker y usando data a-priori.
 - Para usar la data a-priori se creo en "features" la carpeta "data" con el archivo test_data.json.
-- Para usar faker se usaron dos métodos, el primero con un archivo llamado  data-generator.js ubicado en la carpeta."helpers" ubicado en "features", el segundo método usado en algunos steps se coloco directamente  faker accediendo al tipo de dato que se necesitara (Ej. faker.lorem.sentence(300)).
+- Para usar faker se usaron dos métodos, el primero con un archivo llamado data-generator.js ubicado en la carpeta."helpers" ubicado en "features", el segundo método usado en algunos steps se coloco directamente faker accediendo al tipo de dato que se necesitara (Ej. faker.lorem.sentence(300)).
 - Las features a probar se encuentran en la carpeta "5_96" de la carpeta "all_features"; cada feature a probar debe cambiarse a la carpeta "feature" y colocar el comando según sea el caso usando el tag (npx cucumber-js --tags "remplazarElTagAqui")
 
 A continuación se detallan los casos desarrollados:
 
 - A-priori:
+
   1. prueba1.feature
-    Con mi usuario y contraseña de ghost quiero crear un sitio con el titulo vacío
-    tag: @empty-data
+     Con mi usuario y contraseña de ghost quiero crear un sitio con el titulo vacío
+     tag: @empty-data
 
   2. prueba3.feature
-    Con mi usuario de ghost quiero crear un post sin datos
-    tag: @empty-data
+     Con mi usuario de ghost quiero crear un post sin datos
+     tag: @empty-data
 
   3. prueba5.feature
-    Con mi usuario de ghost quiero crear un nuevo miembro sin datos a priori
-    tag: @empty_data
+     Con mi usuario de ghost quiero crear un nuevo miembro sin datos a priori
+     tag: @empty_data
 
   4. prueba5.feature
-    Con mi usuario de ghost quiero crear un nuevo miembro con email sin arroba a priori
-    tag: @email_whitout_arroba
+     Con mi usuario de ghost quiero crear un nuevo miembro con email sin arroba a priori
+     tag: @email_whitout_arroba
 
   5. prueba5.feature
-    Con mi usuario de ghost quiero crear un nuevo miembro con el email sin punto com a priori
-    tag: @email_whitout_dotcom
+     Con mi usuario de ghost quiero crear un nuevo miembro con el email sin punto com a priori
+     tag: @email_whitout_dotcom
 
 - Faker:
+
   1. prueba0.feature
-    Login fallido con credenciales aleatorias
-    tag: @faker
+     Login fallido con credenciales aleatorias
+     tag: @faker
 
   2. prueba1.feature
-    Con mi usuario y contraseña de ghost quiero crear un sitio exitosamente con datos aleatorios
-    tag: @success
+     Con mi usuario y contraseña de ghost quiero crear un sitio exitosamente con datos aleatorios
+     tag: @success
 
   3. prueba1.feature
-    Con mi usuario y contraseña de ghost quiero crear un sitio con un titulo muy largo
-    tag: @over_max_title
+     Con mi usuario y contraseña de ghost quiero crear un sitio con un titulo muy largo
+     tag: @over_max_title
 
   4. prueba3.feature
-    Con mi usuario de ghost quiero crear un post con datos aleatorios
-    tag: @success
+     Con mi usuario de ghost quiero crear un post con datos aleatorios
+     tag: @success
 
   5. prueba3.feature
-    Con mi usuario de ghost quiero crear un post con datos aleatorios que superen lo permitido
-    tag: @over_max_title
+     Con mi usuario de ghost quiero crear un post con datos aleatorios que superen lo permitido
+     tag: @over_max_title
 
   6. prueba5.feature
-    Con mi usuario de ghost quiero crear un nuevo miembro con datos aleatorios
-    tag: @success
+     Con mi usuario de ghost quiero crear un nuevo miembro con datos aleatorios
+     tag: @success
 
   7. prueba5.feature
-    Con mi usuario de ghost quiero crear un nuevo miembro con datos aleatorios y que la nota supere lo permitido
-    tag: @over_max_note
+     Con mi usuario de ghost quiero crear un nuevo miembro con datos aleatorios y que la nota supere lo permitido
+     tag: @over_max_note
 
   8. prueba7.feature
-    Crear tag exitosamene con datos aleatorios
-    tag: @success
+     Crear tag exitosamene con datos aleatorios
+     tag: @success
 
   9. prueba7.feature
-    Crear tag error por mas de 191 caracteres en el nombre
-    tag: @over_max_name
+     Crear tag error por mas de 191 caracteres en el nombre
+     tag: @over_max_name
 
   10. prueba7.feature
-    Crear tag error con descripción de mas de 500 caracteres
-    tag: @over_max_description
+      Crear tag error con descripción de mas de 500 caracteres
+      tag: @over_max_description
 
   11. prueba9.feature
-    Editar el titulo y la descripcion del sitio exitosamente con datos aleatorios
-    tag: @success
+      Editar el titulo y la descripcion del sitio exitosamente con datos aleatorios
+      tag: @success
+
+```
 
 ```
