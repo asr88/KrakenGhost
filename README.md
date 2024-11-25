@@ -34,11 +34,6 @@ Pruebas realizadas sobre ghost con kraken-
 - En nuestro caso fue necesario usar la dependencia sharp para poder comparar las imagenes, por lo que se debe instalarla con el comando **npm install sharp**
 - Por último se debe ejecutar el comando **npm test**
 
-# Pasos para usar faker en el proyecto kraken:
-
--Primero se debe instalar Faker en el proyecto ejecutando el comando **npm install @faker-js/faker**
--En el archivo llamado DataGenerator.ts ubicado en la carpeta **helpers** se encuentra la implementación de faker para generar datos aleatorios.
-
 # Las 10 funcionalidades de GHOST que se trabajan en esta semana 5 son:
 
 - prueba1 (Crear page)
@@ -64,6 +59,11 @@ Pruebas realizadas sobre ghost con kraken-
 - prueba1 (Crear page)
 
 # Entrega semana 7
+
+# Pasos para usar faker en el proyecto kraken:
+
+-Primero se debe instalar Faker en el proyecto ejecutando el comando **npm install @faker-js/faker**
+-En el archivo llamado DataGenerator.ts ubicado en la carpeta **helpers** se encuentra la implementación de faker para generar datos aleatorios.
 
 - Se crean escenarios para pruebas realizadas usando faker y usando data a-priori.
 - Para usar la data a-priori se creo en "features" la carpeta "data" con el archivo test_data.json.
