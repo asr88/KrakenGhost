@@ -70,6 +70,12 @@ Pruebas realizadas sobre ghost con kraken-
 - Para usar faker se usaron dos métodos, el primero con un archivo llamado data-generator.js ubicado en la carpeta."helpers" ubicado en "features", el segundo método usado en algunos steps se coloco directamente faker accediendo al tipo de dato que se necesitara (Ej. faker.lorem.sentence(300)).
 - Las features a probar se encuentran en la carpeta "5_96" de la carpeta "all_features"; cada feature a probar debe cambiarse a la carpeta "feature" y colocar el comando según sea el caso usando el tag (npx cucumber-js --tags "remplazarElTagAqui")
 
+**Nota:** Los escenarios se ejecutan moviendo el archivo de all_feature->5_96 a la carpeta feature; luego y según el escenario (tagName) que se quiera correr se ejecuta
+
+```bash
+npx cucumber-js --tags "@tagName"
+```
+
 A continuación se detallan los casos desarrollados:
 
 - A-priori:
