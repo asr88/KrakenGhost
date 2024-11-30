@@ -130,15 +130,18 @@ When("I enter title post with random info over_max_title", async function () {
   }
 });
 
-When("I enter title page with random info over_max_title", async function () {
-  await new Promise((r) => setTimeout(r, 8000));
-  let element = await this.driver.$("[data-test-editor-title-input]");
-  let isVisible = await element.isDisplayed();
-  if (isVisible) {
-    let randomTitle = faker.lorem.sentence(300);
-    await element.setValue(randomTitle);
+When(
+  "I enter title page edit with random info over_max_title",
+  async function () {
+    await new Promise((r) => setTimeout(r, 8000));
+    let element = await this.driver.$("[data-test-editor-title-input]");
+    let isVisible = await element.isDisplayed();
+    if (isVisible) {
+      let randomTitle = faker.lorem.sentence(300);
+      await element.setValue(randomTitle);
+    }
   }
-});
+);
 
 When("I enter email new member with random info", async function () {
   try {
